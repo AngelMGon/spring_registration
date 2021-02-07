@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rest-register
+spec:
+  selector:
+    matchLabels:
+      app: rest-register
+  replicas: 1 # deployment runs 3 pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: rest-register
+    spec:
+      containers:
+      - name: rest-register
+        image: fra.ocir.io/fre4v6wtcvwd/demo/spring-registration:latest
+        imagePullPolicy: Always
+        ports:
+        - name: rest-register
+          containerPort: 8080 #Endpoint is at port 8080 in the container
+          protocol: TCP
+      imagePullSecrets:
+      - name: ocirsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest-register-lb
+  labels:
+    app: rest-register
+spec:
+  type: LoadBalancer #Exposes the service as a node port
+  ports:
+  - port: 8080
+  selector:
+    app: rest-register
